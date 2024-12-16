@@ -452,6 +452,15 @@ test('gfmAutolinkLiteralToMarkdown()', async function (t) {
   )
 })
 
+/**
+ * Normalizes line endings to Unix style (\n)
+ * @param {string} text - The text to normalize
+ * @returns {string} The normalized text
+ */
+function normalizeLineEndings(text) {
+  return text.replaceAll('\r\n', '\n')
+}
+
 test('fixtures', async function (t) {
   const root = new URL('fixture/', import.meta.url)
 
@@ -469,8 +478,10 @@ test('fixtures', async function (t) {
       const inputUrl = new URL(file, root)
       const expectedUrl = new URL(stem + '.html', root)
 
-      const input = await fs.readFile(inputUrl)
-      const expected = String(await fs.readFile(expectedUrl))
+      const input = normalizeLineEndings(String(await fs.readFile(inputUrl)))
+      const expected = normalizeLineEndings(
+        String(await fs.readFile(expectedUrl))
+      )
 
       const mdast = fromMarkdown(input, {
         extensions: [gfmAutolinkLiteral()],
